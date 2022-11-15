@@ -22,7 +22,6 @@
      <columns>
        <TableColumn fx:id="nameCol" minWidth="50.0" prefWidth="300.0" text="Name" />
        <TableColumn fx:id="emailCol" minWidth="50.0" prefWidth="300.0" text="Email" />
-         <TableColumn fx:id="ageCol" minWidth="50.0" prefWidth="75.0" text="Age" />
      </columns>
    </TableView>
 </VBox>
