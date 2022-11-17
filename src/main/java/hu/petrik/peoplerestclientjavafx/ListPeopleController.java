@@ -89,9 +89,7 @@ public class ListPeopleController extends Controller{
     public void deleteClick(ActionEvent actionEvent) {
         int selectedIndex = peopleTable.getSelectionModel().getSelectedIndex();
         if (selectedIndex == -1) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setHeaderText("pls select a person from a list");
-            alert.show();
+            warning("pls select a person from a list");
             return;
         }
 
