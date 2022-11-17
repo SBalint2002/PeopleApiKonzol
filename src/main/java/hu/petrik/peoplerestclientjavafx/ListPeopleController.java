@@ -4,13 +4,16 @@ import com.google.gson.Gson;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.Optional;
 
-public class ListPeopleController {
+public class ListPeopleController extends Controller{
 
     @FXML
     private Button insertButton, updateButton, deleteButton;
@@ -34,11 +37,7 @@ public class ListPeopleController {
             try {
                 loadPeopleFromServer();
             } catch (IOException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("ERROR!");
-                alert.setHeaderText("Couldn't get data from server");
-                alert.setContentText(e.getMessage());
-                alert.showAndWait();
+                error("Couldn't get data from server",e.getMessage());
                 Platform.exit();
             }
         });
@@ -56,7 +55,30 @@ public class ListPeopleController {
     }
 
     @FXML
-    public void insertClick(ActionEvent actionEvent) {
+    public void insertClick(ActionEvent actionEvent){
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("create-people-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 640, 480);
+            Stage stage = new Stage();
+            stage.setTitle("Create People");
+            stage.setScene(scene);
+            stage.show();
+            insertButton.setDisable(true);
+            updateButton.setDisable(true);
+            deleteButton.setDisable(true);
+            stage.setOnCloseRequest(event -> {
+                try {
+                    insertButton.setDisable(false);
+                    updateButton.setDisable(false);
+                    deleteButton.setDisable(false);
+                    loadPeopleFromServer();
+                } catch (IOException e) {
+                    error("An error occurred while communicating with the server");
+                }
+            });
+        } catch (IOException e) {
+            error("Could not load form", e.getMessage());
+        }
     }
 
     @FXML
@@ -75,22 +97,19 @@ public class ListPeopleController {
 
         Person selected = peopleTable.getSelectionModel().getSelectedItem();
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmation.setHeaderText(String.format("Are you sure want to delete %s?",selected.getName()));
+        confirmation.setHeaderText(String.format("Are you sure want to delete %s?", selected.getName()));
         Optional<ButtonType> optionalButtonType = confirmation.showAndWait();
-        if (optionalButtonType.isEmpty()){
-            System.out.println("Ismeretlen probléma történt");
+        if (optionalButtonType.isEmpty()) {
+            System.out.println("Unknown error occurred");
             return;
         }
         ButtonType clickButton = optionalButtonType.get();
-        if (clickButton.equals(ButtonType.OK)){
+        if (clickButton.equals(ButtonType.OK)) {
             String url = App.BASE_URL + "/" + selected.getId();
             try {
                 RequestHandler.delete(url);
             } catch (IOException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setHeaderText("An error occured while communicating with the server");
-                alert.setContentText(e.getMessage());
-                alert.show();
+                error("An error occurred while communicating with the server");
             }
         }
         try {
@@ -100,4 +119,5 @@ public class ListPeopleController {
         }
 
     }
+
 }
