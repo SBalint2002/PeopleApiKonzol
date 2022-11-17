@@ -38,7 +38,6 @@ public class ListPeopleController {
                 alert.setTitle("ERROR!");
                 alert.setHeaderText("Couldn't get data from server");
                 alert.setContentText(e.getMessage());
-
                 alert.showAndWait();
                 Platform.exit();
             }
@@ -93,6 +92,11 @@ public class ListPeopleController {
                 alert.setContentText(e.getMessage());
                 alert.show();
             }
+        }
+        try {
+            loadPeopleFromServer();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
     }
