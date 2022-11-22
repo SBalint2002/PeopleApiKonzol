@@ -67,10 +67,10 @@ public class ListPeopleController extends Controller{
             updateButton.setDisable(true);
             deleteButton.setDisable(true);
             stage.setOnCloseRequest(event -> {
+                insertButton.setDisable(false);
+                updateButton.setDisable(false);
+                deleteButton.setDisable(false);
                 try {
-                    insertButton.setDisable(false);
-                    updateButton.setDisable(false);
-                    deleteButton.setDisable(false);
                     loadPeopleFromServer();
                 } catch (IOException e) {
                     error("An error occurred while communicating with the server");
@@ -83,6 +83,37 @@ public class ListPeopleController extends Controller{
 
     @FXML
     public void updateClick(ActionEvent actionEvent) {
+        int selectedIndex = peopleTable.getSelectionModel().getSelectedIndex();
+        if (selectedIndex == -1) {
+            warning("pls select a person from a list");
+            return;
+        }
+        Person selected = peopleTable.getSelectionModel().getSelectedItem();
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("update-people-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 640, 480);
+            Stage stage = new Stage();
+            stage.setTitle("Update People");
+            stage.setScene(scene);
+            UpdatePeopleController controller = fxmlLoader.getController();
+            controller.setPerson(selected);
+            stage.show();
+            insertButton.setDisable(true);
+            updateButton.setDisable(true);
+            deleteButton.setDisable(true);
+            stage.setOnHidden(event -> {
+                insertButton.setDisable(false);
+                updateButton.setDisable(false);
+                deleteButton.setDisable(false);
+                try {
+                    loadPeopleFromServer();
+                } catch (IOException e) {
+                    error("An error occurred while communicating with the server");
+                }
+            });
+        } catch (IOException e) {
+            error("Could not load form", e.getMessage());
+        }
     }
 
     @FXML
